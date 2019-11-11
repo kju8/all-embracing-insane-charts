@@ -64,4 +64,4 @@ for(let i in list) {
 fs.mkdirSync('build', function (err) {
 	throw err;
 });
-fs.writeFileSync('./build/table.json', JSON.stringify(jsonArray));
+fs.writeFileSync('./build/table.json', JSON.stringify(jsonArray, null, '\t'));
