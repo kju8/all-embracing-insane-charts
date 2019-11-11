@@ -11,4 +11,4 @@ git remote add origin https://kju8:${GITHUB_TOKEN}@github.com/kju8/all-embracing
 git add table.json
 git commit -m "build"
 
-git push origin master:build
+git push -f origin master:build
