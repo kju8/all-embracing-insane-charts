@@ -1,0 +1,14 @@
+{
+  "name": "all-embracing-insane-charts",
+  "version": "1.0.0",
+  "main": "build.js",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "repository": "git@github.com:kju8/all-embracing-insane-charts.git",
+  "author": "Takuya Namba <1994athame@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "json5": "^2.1.1"
+  }
+}
