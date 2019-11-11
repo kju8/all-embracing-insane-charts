@@ -60,6 +60,10 @@ var jsonArray = [];
 for(let i in list) {
 	jsonArray.push(json5.parse(fs.readFileSync(list[i])));
 }
+
+fs.unlinkSync('./build/table.json');
+fs.rmdirSync('build');
+
 fs.mkdirSync('build', function (err) {
 	throw err;
 });

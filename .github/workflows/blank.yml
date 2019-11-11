@@ -23,12 +23,6 @@ jobs:
       env:
         CI: true
     - name: Commit files
-      run: |
-        cd build
-        git init
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git remote add origin git@github.com:kju8/all-embracing-insane-charts.git
-        git add table.json
-        git commit -m "build"
-        git push origin master:build
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: ./build.sh
