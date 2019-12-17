@@ -1,5 +1,145 @@
 <html>
 	<head>
-		<meta name="bmstable" content="./head.json" />
+		<meta name="bmstable" content="https://kju8.github.io/all-embracing-insane-charts/head.json" />
+		<meta name="bmsdata" content="https://kju8.github.io/all-embracing-insane-charts/table.json" />
+		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+		<title>All-embracing Insane Charts</title>
+		<style>
+			#app {
+				display:grid;
+				min-width: max-content;
+				grid-template-columns: 10ex minmax(max-content, 2fr) 1fr 1fr 2fr;
+				border: solid 0.5px rgba(100,100,100,0.2);
+			}
+			#app > * {
+				border: solid 0.5px rgba(100,100,100,0.2);
+				padding: 0.1rem;
+			}
+			#app > .level:not(.thead) {
+				text-align: right;
+				padding-right: 0.2em;
+			}
+			#app > .thead {
+				background-color: rgba(0,0,0,0.2);
+				font-weight: bold;
+				text-align: center;
+				position: relative;
+			}
+			.sort::after {
+				content: "";
+				position: absolute;
+				right: 0.4em;
+				top: 0.5em;
+				display: block;
+				width: 0.2em;
+				height: 0.2em;
+				border: 3px solid;
+				border-color: transparent transparent black black;
+				transform: rotate(-45deg);
+				opacity: 0.5;
+			}
+			.sort.desc::after {
+				border-color: black black transparent transparent;
+				top: 0.6em;
+			}
+			#app > a {
+				text-decoration: none;
+			}
+			#app > a[href]:hover {
+				background-color: rgba(200,0,0,0.2);
+			}
+			.levelhead {
+				grid-column: 1 / -1;
+				text-align: center;
+				font-size: 0.9em;
+			}
+		</style>
 	</head>
+	<body>
+		<div id="app">
+			<div class="level thead" v-bind:class="{ sort: sorttype == 'level' , desc: sortmode != 1}" v-on:click="sort('level')">Level</div>
+			<div class="title thead" v-bind:class="{ sort: sorttype == 'title' , desc: sortmode != 1 }" v-on:click="sort('title')">Title</div>
+			<div class="artist thead" v-bind:class="{ sort: sorttype == 'artist' , desc: sortmode != 1 }" v-on:click="sort('artist')">Artist</div>
+			<div class="diff thead" v-bind:class="{ sort: sorttype == 'name_diff' , desc: sortmode != 1 }" v-on:click="sort('name_diff')">Chart Artist</div>
+			<div class="comment thead">Comment</div>
+			<template v-for="bms in bmses">
+				<div class="level">{{bms.level}}</div>
+				<div class="title">{{bms.title}}</div>
+				<a class="artist" v-bind:href="bms.url">{{bms.artist}}</a>
+				<a class="diff" v-bind:href="bms.url_diff">{{bms.name_diff}}</a>
+				<div class="comment">{{bms.comment}}</div>
+			</template>
+			<template v-for="(count,difficult) in difficulties" v-if="sorttype=='level'">
+				<div class="levelhead" v-bind:style="levelstyle(difficult)">{{difficult}} ({{count}}譜面)</div>
+			</template>
+		</div>
+		<script>
+			let standizeStrings = function(src){
+				return src.toLowerCase().replace(/[\u30a1-\u30f6]/g, function(match) {
+					var chr = match.charCodeAt(0) - 0x60;
+					return String.fromCharCode(chr);
+				});
+			};
+			let app = new Vue({
+				el: '#app',
+				data: {
+					bmses: [],
+					difficulties: {},
+					sorttype: "level",
+					sortmode: -1
+				},
+				methods: {
+					sort: function(key){
+						if(this.sorttype == key) this.sortmode = -this.sortmode;
+						else{
+							this.sortmode = 1;
+							this.sorttype = key;
+						}
+
+						this.bmses.sort(
+							(a,b) => {
+								let aStrings = standizeStrings((a[key]||"").toString());
+								let bStrings = standizeStrings((b[key]||"").toString());
+								if(aStrings == "") return 1;
+								if(bStrings == "") return -1;
+								if(aStrings < bStrings) return -this.sortmode;
+								if(aStrings > bStrings) return this.sortmode;
+								return 0;
+							}
+						);
+					},
+					levelstyle: function(difficult){
+						let totalcount = 2;
+						let diffcount = 0;
+						for(let i in this.difficulties){
+							if( ( (this.sortmode == 1) && (i < difficult) ) || (this.sortmode == -1) && (i > difficult) ){
+								totalcount += this.difficulties[i];
+								diffcount++;
+							}
+						}
+						return {gridRow: (totalcount+diffcount) + " / " + (totalcount+diffcount+1)}
+					}
+				}
+			});
+
+			let request = new XMLHttpRequest();
+			let bmsdata = document.head.children.namedItem("bmsdata").getAttribute('content')
+			request.open('GET', bmsdata);
+			request.responseType = 'json';
+			request.send();
+
+			request.onload = function() {
+				let res = request.response;
+				app.bmses = res;
+				let difflist = {}
+				for(let i in res){
+					let bms = res[i];
+					if(difflist[bms.level] === undefined) difflist[bms.level] = 0;
+					difflist[bms.level]++;
+				}
+				app.difficulties = difflist;
+				app.sort("level");
+			}
+		</script>
+	</body>
 </html>
