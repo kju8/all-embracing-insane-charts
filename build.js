@@ -61,7 +61,4 @@ for(let i in list) {
 	jsonArray.push(json5.parse(fs.readFileSync(list[i])));
 }
 
-fs.mkdirSync('build', function (err) {
-	throw err;
-});
 fs.writeFileSync('./build/table.json', JSON.stringify(jsonArray, null, '\t'));

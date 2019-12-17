@@ -1,5 +1,8 @@
 #!/bin/bash
 
+rm -rf build
+mkdir build
+
 cd build
 
 git init
@@ -9,7 +12,7 @@ git config --local user.name "GitHub Action"
 git remote add origin https://kju8:${GITHUB_TOKEN}@github.com/kju8/all-embracing-insane-charts.git
 
 git checkout master
-git pull origin gh-pages
+git pull origin build
 
 cd ../
 npm ci
