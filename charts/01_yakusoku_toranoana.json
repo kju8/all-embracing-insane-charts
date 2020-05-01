@@ -19,5 +19,7 @@
 	"total":570.0,
 	"judge":3,
 	"notes":2056,
-	"tag":[]
+	"tag":[],
+	
+	"confirmed":false
 }
